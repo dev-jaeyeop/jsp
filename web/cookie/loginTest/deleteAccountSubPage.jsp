@@ -13,26 +13,29 @@
 <body>
 <%
     Cookie[] cookies = request.getCookies();
-    Cookie existId = null;
-    Cookie existPassword = null;
 
     if (cookies != null && cookies.length > 0) {
         for (int i = 0; i < cookies.length; i++) {
-            if (cookies[i].getName().equals("id") || cookies[i].getName().equals("password") || cookies[i].getName().equals("email")) {
+            String[] userInfo = cookies[i].getValue().split("/");
+            String id = cookies[i].getName();
+            String password = userInfo[0];
+            if (id.equals(request.getParameter("id")) && password.equals(request.getParameter("password"))) {
                 Cookie cookie = new Cookie(cookies[i].getName(), cookies[i].getValue());
                 cookie.setMaxAge(0);
                 response.addCookie(cookie);
-            }
-        }
 %>
-success!
+success! <br><br>
 <input type="button" value="login page" onclick="location='loginMainPage.jsp'">
 <%
+    break;
 } else {
 %>
-error!
+error! <br><br>
 <input type="button" value="previous page" onclick="location='deleteAccountMainPage.jsp'">
 <%
+                break;
+            }
+        }
     }
 %>
 </body>

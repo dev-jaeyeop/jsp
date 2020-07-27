@@ -24,7 +24,7 @@
     <table>
         <tr>
             <td colspan="2">
-                join
+                Create Account
             </td>
         </tr>
         <tr>
@@ -40,7 +40,12 @@
             <td><input type="email" name="email"></td>
         </tr>
         <tr>
-            <td colspan="2"><input type="submit" value="sign up"></td>
+            <td>
+                <input type="submit" value="create account">
+            </td>
+            <td>
+                <input type="button" value="login page" onclick="location='loginMainPage.jsp'">
+            </td>
         </tr>
     </table>
     </body>

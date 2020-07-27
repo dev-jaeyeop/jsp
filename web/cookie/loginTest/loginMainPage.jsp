@@ -9,10 +9,24 @@
 <html>
 <head>
     <title>loginMainPage</title>
+    <style>
+        table {
+            border: 1px solid black;
+        }
+
+        td {
+            text-align: center;
+        }
+    </style>
 </head>
 <form action="loginSubPage.jsp">
     <body>
     <table>
+        <tr>
+            <td colspan="2">
+                Sign in
+            </td>
+        </tr>
         <tr>
             <td>id</td>
             <td><input type="text" name="id"></td>
@@ -22,8 +36,11 @@
             <td><input type="password" name="password"></td>
         </tr>
         <tr>
-            <td colspan="2">
-                <input type="submit" value="sign in">
+            <td>
+                <input type="button" value="create account" onclick="location='joinMainPage.jsp'">
+            </td>
+            <td>
+                <input type="submit" value="login">
             </td>
         </tr>
     </table>

@@ -13,22 +13,22 @@
 <body>
 <%
     Cookie[] cookies = request.getCookies();
+
     if (cookies != null && cookies.length > 0) {
         for (int i = 0; i < cookies.length; i++) {
-            switch (cookies[i].getName()) {
-                case "id":
-                    response.addCookie(new Cookie(cookies[i].getName(), request.getParameter("id")));
-                    break;
-                case "password":
-                    response.addCookie(new Cookie(cookies[i].getName(), request.getParameter("password")));
-                    break;
-                case "email":
-                    response.addCookie(new Cookie(cookies[i].getName(), request.getParameter("email")));
-                    break;
+            if (cookies[i].getName().equals(request.getParameter("id"))) {
+                String[] userInfo = cookies[i].getValue().split("/");
+                userInfo[0] = request.getParameter("password");
+                userInfo[1] = request.getParameter("email");
+                String updateInfo = "";
+                for (int j = 0; j < userInfo.length; j++) {
+                    updateInfo += userInfo[j] + "/";
+                }
+                response.addCookie(new Cookie(cookies[i].getName(), updateInfo));
             }
         }
 %>
-success!
+success! <br><br>
 <input type="button" value="login page" onclick="location='loginMainPage.jsp'">
 <%
     }

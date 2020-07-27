@@ -13,17 +13,16 @@
 <body>
 <%
     if (!request.getParameter("id").equals("") && !request.getParameter("password").equals("") && !request.getParameter("email").equals("")) {
-        response.addCookie(new Cookie("id", request.getParameter("id")));
-        response.addCookie(new Cookie("password", request.getParameter("password")));
-        response.addCookie(new Cookie("email", request.getParameter("email")));
+        String userInfo = request.getParameter("password") + "/" + request.getParameter("email") + "/";
+        response.addCookie(new Cookie(request.getParameter("id"), userInfo));
 %>
-success<br><br>
+success! <br><br>
 <input type="button" value="login page" onclick="location='loginMainPage.jsp'">
 <%
 } else {
 %>
-error
-<input type="button" value="previous page" onclick="location='joinMainPage.jsp'">
+error! <br><br>
+<input type="button" value="create account" onclick="location='joinMainPage.jsp'">
 <%
     }
 %>

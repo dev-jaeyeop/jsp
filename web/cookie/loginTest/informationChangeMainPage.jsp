@@ -11,34 +11,25 @@
     <title>informationChangePage</title>
 </head>
 <body>
-<form action="informationChangeSubPage.jsp">
-    <%
-        String id = "";
-        String password = "";
-        String email = "";
-        Cookie[] cookies = request.getCookies();
-        for (int i = 0; i < cookies.length; i++) {
-            switch (cookies[i].getName()) {
-                case "id":
-                    id = cookies[i].getValue();
-                    break;
-                case "password":
-                    password = cookies[i].getValue();
-                    break;
-                case "email":
-                    email = cookies[i].getValue();
-                    break;
-            }
+<%
+    String id = "";
+    String password = "";
+    String email = "";
+    Cookie[] cookies = request.getCookies();
+
+    for (int i = 0; i < cookies.length; i++) {
+        String[] userInfo = cookies[i].getValue().split("/");
+        if (cookies[i].getName().equals(request.getParameter("id"))) {
+            id = cookies[i].getName();
+            password = userInfo[0];
+            email = userInfo[1];
         }
-    %>
+    }
+%>
+<form action="informationChangeSubPage.jsp">
     <table>
         <tr>
-            <td>id</td>
-            <td>
-                <input type="text" name="id" value="<%=id%>">
-            </td>
-        </tr>
-        <tr>
+            <input type="hidden" name="id" value="<%=id%>">
             <td>password</td>
             <td>
                 <input type="text" name="password" value="<%=password%>">
@@ -52,7 +43,7 @@
         </tr>
         <tr>
             <td colspan="2">
-                <input type="submit" value="informationChange">
+                <input type="submit" value="information change">
             </td>
         </tr>
     </table>
