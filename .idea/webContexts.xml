@@ -4,6 +4,7 @@
     <option name="state">
       <map>
         <entry key="file://$PROJECT_DIR$/web/expressionLanguage/member.jsp" value="file://$PROJECT_DIR$/web/expressionLanguage" />
+        <entry key="file://$PROJECT_DIR$/web/jdbcConnect.jsp" value="file://$PROJECT_DIR$/web" />
       </map>
     </option>
   </component>
