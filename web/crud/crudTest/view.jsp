@@ -34,29 +34,30 @@
     </tr>
     <tr>
         <td>
-            NAME
+            ID
         </td>
         <td>
-            ID
+            NAME
         </td>
         <td>
             E-MAIL
         </td>
     </tr>
     <%
-        DataAccessObject dataAccessObject = new DataAccessObject();
-        ArrayList<DataTransferObject> dataAccessObjects = dataAccessObject.select();
-        for (int i = 0; i < dataAccessObjects.size(); i++) {
+        DataAccessObject user = new DataAccessObject();
+        ArrayList<DataTransferObject> users = user.select();
+
+        for (int i = 0; i < users.size(); i++) {
     %>
     <tr>
         <td>
-            <%=dataAccessObjects.get(i).getId()%>
+            <%=users.get(i).getId()%>
         </td>
         <td>
-            <%=dataAccessObjects.get(i).getName()%>
+            <%=users.get(i).getName()%>
         </td>
         <td>
-            <%=dataAccessObjects.get(i).getEmail()%>
+            <%=users.get(i).getEmail()%>
         </td>
     </tr>
     <%

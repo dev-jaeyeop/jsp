@@ -1,7 +1,8 @@
-package crudTest;
+package guestBook;
 
 import java.sql.*;
 import java.util.ArrayList;
+
 
 public class DataAccessObject {
 
@@ -23,27 +24,43 @@ public class DataAccessObject {
         return connection;
     }
 
-    public int insert(String id, String password, String name, String email) {
+    public void insert(String name, String password, String text) {
         Connection connection = getConnection();
         PreparedStatement preparedStatement = null;
         int resultSet = 0;
 
-        String query = "insert into member values(?, ?, ?, ?)";
+        String query = "insert into guest_book(name, password, date, text) values(?, ?, now(), ?)";
 
         try {
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, id);
+            preparedStatement.setString(1, name);
             preparedStatement.setString(2, password);
-            preparedStatement.setString(3, name);
-            preparedStatement.setString(4, email);
+            preparedStatement.setString(3, text);
             resultSet = preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         freeCon(preparedStatement, connection);
+    }
 
-        return resultSet;
+    public void insertReply(String idx, String reply) {
+        Connection connection = getConnection();
+        PreparedStatement preparedStatement = null;
+        int resultSet = 0;
+
+        String query = "insert into reply_db(idx, reply) values(?, ?)";
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, Integer.parseInt(idx));
+            preparedStatement.setString(2, reply);
+            resultSet = preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        freeCon(preparedStatement, connection);
     }
 
     public ArrayList<DataTransferObject> select() {
@@ -52,7 +69,7 @@ public class DataAccessObject {
         Statement statement = null;
         ResultSet resultSet = null;
 
-        String query = "select * from member";
+        String query = "select * from guest_book";
 
         try {
             statement = connection.createStatement();
@@ -60,10 +77,11 @@ public class DataAccessObject {
 
             while (resultSet.next()) {
                 DataTransferObject user = new DataTransferObject();
-                user.setId(resultSet.getString("memberid"));
-                user.setPassword(resultSet.getString("password"));
+                user.setIdx(resultSet.getInt("idx"));
                 user.setName(resultSet.getString("name"));
-                user.setEmail(resultSet.getString("email"));
+                user.setPassword(resultSet.getString("password"));
+                user.setDate(resultSet.getString("date"));
+                user.setText(resultSet.getString("text"));
                 users.add(user);
             }
         } catch (SQLException e) {
@@ -76,75 +94,62 @@ public class DataAccessObject {
         return users;
     }
 
-    public DataTransferObject find(String id) {
+    public ArrayList<DataTransferObject> selectReply(String idx) {
+        ArrayList<DataTransferObject> replys = new ArrayList<>();
         Connection connection = getConnection();
-        Statement statement = null;
+        PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        DataTransferObject findUser = new DataTransferObject();
 
-        String query = "select * from member where memberid = '" + id + "'";
+        String query = "select * from reply_db where idx = ?";
 
         try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(query);
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, idx);
+            resultSet = preparedStatement.executeQuery();
 
-            if (resultSet.next()) {
-                findUser.setId(resultSet.getString("memberid"));
-                findUser.setPassword(resultSet.getString("password"));
-                findUser.setName(resultSet.getString("name"));
-                findUser.setEmail(resultSet.getString("email"));
+            while (resultSet.next()) {
+                DataTransferObject reply = new DataTransferObject();
+                reply.setIdx(resultSet.getInt("idx"));
+                reply.setReply(resultSet.getString("reply"));
+                replys.add(reply);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
-        freeCon(resultSet, statement, connection);
+
+        freeCon(resultSet, preparedStatement, connection);
+
+        return replys;
+    }
+
+    public DataTransferObject find(String idx) {
+        Connection connection = getConnection();
+        PreparedStatement preparedStatement = null;
+        ResultSet resultSet = null;
+        DataTransferObject findUser = new DataTransferObject();
+
+        String query = "select * from guest_book where idx = ?";
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, idx);
+            resultSet = preparedStatement.executeQuery();
+
+            if (resultSet.next()) {
+                findUser.setIdx(resultSet.getInt("idx"));
+                findUser.setName(resultSet.getString("name"));
+                findUser.setPassword(resultSet.getString("password"));
+                findUser.setDate(resultSet.getString("date"));
+                findUser.setText(resultSet.getString("text"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        freeCon(resultSet, preparedStatement, connection);
 
         return findUser;
-    }
-
-    public int update(String id, String password, String name, String email, String oid) {
-        Connection connection = getConnection();
-        PreparedStatement preparedStatement = null;
-        int resultSet = 0;
-
-        String query = "update member set memberid = ?, password = ?, name = ?, email = ? where memberid = ?";
-
-        try {
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, id);
-            preparedStatement.setString(2, password);
-            preparedStatement.setString(3, email);
-            preparedStatement.setString(4, name);
-            preparedStatement.setString(5, oid);
-            resultSet = preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        freeCon(preparedStatement, connection);
-
-        return resultSet;
-    }
-
-    public int delete(String id) {
-        Connection connection = getConnection();
-        PreparedStatement preparedStatement = null;
-        int resultSet = 0;
-
-        String query = "delete from member where memberid = ?";
-
-        try {
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, id);
-            resultSet = preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        freeCon(preparedStatement, connection);
-
-        return resultSet;
     }
 
     private void freeCon(ResultSet resultSet, Statement statement, Connection connection) {
@@ -175,5 +180,4 @@ public class DataAccessObject {
 
         }
     }
-
 }

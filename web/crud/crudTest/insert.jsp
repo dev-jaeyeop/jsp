@@ -17,6 +17,7 @@
     String memberPassword = request.getParameter("password");
     String name = request.getParameter("name");
     String email = request.getParameter("email");
+
     DataAccessObject dataAccessObject = new DataAccessObject();
     dataAccessObject.insert(memberId, memberPassword, name, email);
 %>
