@@ -1,8 +1,8 @@
 <%--
   Created by IntelliJ IDEA.
   User: user
-  Date: 2020-08-03
-  Time: 오전 10:46
+  Date: 2020-08-04
+  Time: 오후 2:07
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
@@ -14,11 +14,6 @@
             border-collapse: collapse;
             border: 1px solid black;
             text-align: center;
-
-        }
-
-        textarea {
-            width: 100%;
         }
     </style>
 </head>
@@ -27,15 +22,15 @@
     <table>
         <tr>
             <td colspan="2">
-                guest book
+                join
             </td>
         </tr>
         <tr>
             <td>
-                name
+                id
             </td>
             <td>
-                <input type="text" name="name" maxlength="10">
+                <input type="text" name="id">
             </td>
         </tr>
         <tr>
@@ -43,22 +38,23 @@
                 password
             </td>
             <td>
-                <input type="password" name="password" maxlength="10">
+                <input type="password" name="password">
             </td>
         </tr>
         <tr>
-            <td colspan="2">
-                text
+            <td>
+                name
+            </td>
+            <td>
+                <input type="text" name="name">
             </td>
         </tr>
         <tr>
-            <td colspan="2">
-                <textarea name="text" cols="30" rows="10"></textarea>
+            <td>
+                <input type="button" value="login" onclick="location='login.jsp'">
             </td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <input type="submit" value="write">
+            <td>
+                <input type="submit" value="join">
             </td>
         </tr>
     </table>

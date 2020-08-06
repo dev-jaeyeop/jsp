@@ -19,6 +19,11 @@
             text-align: center;
         }
 
+        td {
+            width: 70px;
+            word-break: break-all;
+        }
+
         textarea {
             width: 100%;
         }
@@ -27,14 +32,14 @@
 <body>
 <%
     String idx = request.getParameter("idx");
-    DataAccessObject dataAccessObject = new DataAccessObject();
-    DataTransferObject findUser = dataAccessObject.find(idx);
-    ArrayList<DataTransferObject> replyList = dataAccessObject.selectReply(idx);
+    DataAccessObject guestBook = new DataAccessObject();
+    DataTransferObject findGuestBook = guestBook.find(idx);
+    ArrayList<DataTransferObject> replys = guestBook.selectReply(idx);
 %>
 <form action="replyProcess.jsp">
     <table>
         <tr>
-            <td colspan="3">
+            <td colspan="4">
                 reply
             </td>
         </tr>
@@ -42,36 +47,36 @@
             <td>
                 name
             </td>
-            <td colspan="2">
-                <%=findUser.getName()%>
+            <td colspan="3">
+                <%=findGuestBook.getName()%>
             </td>
         </tr>
         <tr>
             <td>
                 date
             </td>
-            <td colspan="2">
-                <%=findUser.getDate()%>
+            <td colspan="3">
+                <%=findGuestBook.getDate()%>
             </td>
         </tr>
         <tr>
             <td>
                 content
             </td>
-            <td colspan="2">
-                <%=findUser.getText()%>
+            <td colspan="3">
+                <%=findGuestBook.getText()%>
             </td>
         </tr>
         <tr>
             <td>
                 reply
             </td>
-            <td colspan="2">
+            <td colspan="3">
                 <%
-                    if (replyList != null) {
-                        for (int i = 0; i < replyList.size(); i++) {
+                    if (replys != null) {
+                        for (int i = 0; i < replys.size(); i++) {
                 %>
-                <%=replyList.get(i).getReply()%><br>
+                <%=replys.get(i).getReply()%><br>
                 <%
                         }
                     }
@@ -79,20 +84,23 @@
             </td>
         </tr>
         <tr>
-            <td colspan="3">
-                <input type="hidden" name="idx" value="<%=findUser.getIdx()%>">
+            <td colspan="4">
+                <input type="hidden" name="idx" value="<%=findGuestBook.getIdx()%>">
                 <textarea name="reply" cols="30" rows="10"></textarea>
             </td>
         </tr>
         <tr>
             <td>
-                <input type="button" value="view" onclick="location='view.jsp'">
-            </td>
-            <td>
                 <input type="submit" value="reply">
             </td>
             <td>
-                <input type="button" value="delete" onclick="location='delete.jsp'">
+                <input type="button" value="view" onclick="location='view.jsp'">
+            </td>
+            <td>
+                <input type="button" value="update" onclick="location='update.jsp?idx=<%=idx%>'">
+            </td>
+            <td>
+                <input type="button" value="delete" onclick="location='delete.jsp?idx=<%=idx%>'">
             </td>
         </tr>
     </table>

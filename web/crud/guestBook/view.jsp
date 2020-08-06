@@ -44,6 +44,7 @@
     </tr>
     <%
         DataAccessObject guestBook = new DataAccessObject();
+
         ArrayList<DataTransferObject> guestBooks = guestBook.select();
 
         for (int i = 0; i < guestBooks.size(); i++) {
@@ -61,7 +62,6 @@
             <%=guestBooks.get(i).getDate()%>
         </td>
     </tr>
-
     <%
         }
     %>

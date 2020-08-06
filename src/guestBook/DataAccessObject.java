@@ -5,19 +5,23 @@ import java.util.ArrayList;
 
 
 public class DataAccessObject {
+    DBConnectionMgr pool = DBConnectionMgr.getInstance();
 
     private Connection getConnection() {
         Connection connection = null;
-        String jdbcDriver = "jdbc:mysql://localhost:3306/testdb";
-        String dbId = "root";
-        String dbPassword = "autoset";
+//        String jdbcDriver = "jdbc:mysql://localhost:3306/testdb";
+//        String dbId = "root";
+//        String dbPassword = "autoset";
 
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection(jdbcDriver, dbId, dbPassword);
+//            Class.forName("com.mysql.jdbc.Driver");
+//            connection = DriverManager.getConnection(jdbcDriver, dbId, dbPassword);
+            connection = pool.getConnection();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -39,9 +43,10 @@ public class DataAccessObject {
             resultSet = preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+//            freeCon(preparedStatement, connection);
+            pool.freeConnection(connection, preparedStatement);
         }
-
-        freeCon(preparedStatement, connection);
     }
 
     public void insertReply(String idx, String reply) {
@@ -53,18 +58,19 @@ public class DataAccessObject {
 
         try {
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, Integer.parseInt(idx));
+            preparedStatement.setString(1, idx);
             preparedStatement.setString(2, reply);
             resultSet = preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+//            freeCon(preparedStatement, connection);
+            pool.freeConnection(connection, preparedStatement);
         }
-
-        freeCon(preparedStatement, connection);
     }
 
     public ArrayList<DataTransferObject> select() {
-        ArrayList<DataTransferObject> users = new ArrayList<>();
+        ArrayList<DataTransferObject> guestBooks = new ArrayList<>();
         Connection connection = getConnection();
         Statement statement = null;
         ResultSet resultSet = null;
@@ -76,22 +82,22 @@ public class DataAccessObject {
             resultSet = statement.executeQuery(query);
 
             while (resultSet.next()) {
-                DataTransferObject user = new DataTransferObject();
-                user.setIdx(resultSet.getInt("idx"));
-                user.setName(resultSet.getString("name"));
-                user.setPassword(resultSet.getString("password"));
-                user.setDate(resultSet.getString("date"));
-                user.setText(resultSet.getString("text"));
-                users.add(user);
+                DataTransferObject guestBook = new DataTransferObject();
+                guestBook.setIdx(resultSet.getInt("idx"));
+                guestBook.setName(resultSet.getString("name"));
+                guestBook.setPassword(resultSet.getString("password"));
+                guestBook.setDate(resultSet.getString("date"));
+                guestBook.setText(resultSet.getString("text"));
+                guestBooks.add(guestBook);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
+//        freeCon(resultSet, statement, connection);
+        pool.freeConnection(connection, statement, resultSet);
 
-        freeCon(resultSet, statement, connection);
-
-        return users;
+        return guestBooks;
     }
 
     public ArrayList<DataTransferObject> selectReply(String idx) {
@@ -115,10 +121,10 @@ public class DataAccessObject {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+//            freeCon(preparedStatement, connection, resultSet);
+            pool.freeConnection(connection, preparedStatement, resultSet);
         }
-
-
-        freeCon(resultSet, preparedStatement, connection);
 
         return replys;
     }
@@ -127,7 +133,7 @@ public class DataAccessObject {
         Connection connection = getConnection();
         PreparedStatement preparedStatement = null;
         ResultSet resultSet = null;
-        DataTransferObject findUser = new DataTransferObject();
+        DataTransferObject findGuestBook = new DataTransferObject();
 
         String query = "select * from guest_book where idx = ?";
 
@@ -137,19 +143,80 @@ public class DataAccessObject {
             resultSet = preparedStatement.executeQuery();
 
             if (resultSet.next()) {
-                findUser.setIdx(resultSet.getInt("idx"));
-                findUser.setName(resultSet.getString("name"));
-                findUser.setPassword(resultSet.getString("password"));
-                findUser.setDate(resultSet.getString("date"));
-                findUser.setText(resultSet.getString("text"));
+                findGuestBook.setIdx(resultSet.getInt("idx"));
+                findGuestBook.setName(resultSet.getString("name"));
+                findGuestBook.setPassword(resultSet.getString("password"));
+                findGuestBook.setDate(resultSet.getString("date"));
+                findGuestBook.setText(resultSet.getString("text"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+//            freeCon(resultSet, preparedStatement, connection);
+            pool.freeConnection(connection, preparedStatement, resultSet);
         }
 
-        freeCon(resultSet, preparedStatement, connection);
+        return findGuestBook;
+    }
 
-        return findUser;
+    public void update(String text, String idx) {
+        Connection connection = getConnection();
+        PreparedStatement preparedStatement = null;
+        int resultSet = 0;
+
+        String query = "update guest_book set text = ?, date = now() where idx = ?";
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, text);
+            preparedStatement.setString(2, idx);
+            resultSet = preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+//            freeCon(preparedStatement, connection);
+            pool.freeConnection(connection, preparedStatement);
+        }
+    }
+
+    public int delete(String idx) {
+        Connection connection = getConnection();
+        PreparedStatement preparedStatement = null;
+        int resultSet = 0;
+
+        String query = "delete from guest_book where idx = ?";
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, idx);
+            resultSet = preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+//            freeCon(preparedStatement, connection);
+            pool.freeConnection(connection, preparedStatement);
+        }
+
+        return resultSet;
+    }
+
+    public void deleteReply(String idx) {
+        Connection connection = getConnection();
+        PreparedStatement preparedStatement = null;
+        int resultSet = 0;
+
+        String query = "delete from reply_db where idx = ?";
+
+        try {
+            preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, idx);
+            resultSet = preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+//            freeCon(preparedStatement, connection);
+            pool.freeConnection(connection, preparedStatement);
+        }
     }
 
     private void freeCon(ResultSet resultSet, Statement statement, Connection connection) {
