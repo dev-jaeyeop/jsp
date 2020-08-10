@@ -9,10 +9,17 @@
 <%@ page import="bulletinBoard.DataAccessObject" %>
 <%@ page import="bulletinBoard.Member" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="bulletinBoard.Content" %>
 <html>
 <head>
     <title>loginPage</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         table, td {
             border-collapse: collapse;
             border: 1px solid black;
@@ -21,36 +28,48 @@
     </style>
 </head>
 <body>
-<table>
-    <%
-        String id = request.getParameter("id");
-        String password = request.getParameter("password");
-        DataAccessObject dataAccessObject = new DataAccessObject();
-        Member member = null;
+<form name="loginPage" action="loginPage.jsp" method="post">
+    <table class="login">
+        <%
+            DataAccessObject dataAccessObject = new DataAccessObject();
+            String id = request.getParameter("id");
+            String password = request.getParameter("password");
+            String logout = request.getParameter("logout");
 
-        // member check
-        if (id != null && password != null) {
-            member = dataAccessObject.checkID(id);
-            if (member != null) {
-                session.setAttribute("id", id);
+            if (logout != null) { // logout check
+                session.removeAttribute("id");
+        %>
+        <script>
+            location.href = 'loginPage.jsp';
+        </script>
+        <%
             }
-        }
-        // login check
-        if (session.getAttribute("id") != null) {
-            ArrayList<Member> members = dataAccessObject.select();
-            for (int i = 0; i < members.size(); i++) {
+
+            if (session.getAttribute("id") == null) { // login check
+                Member member = dataAccessObject.findMember(id); // member check
+                if (member != null && member.getId().equals(id) && member.getPassword().equals(password)) {
+                    session.setAttribute("id", id);
+        %>
+        <script>
+            location.href = 'loginPage.jsp';
+        </script>
+        <%
+        } else if (id != null && password != null && member == null) {
+        %>
+        <script>
+            alert("아이디와 비밀번호를 확인해주세요.")
+        </script>
+        <%
             }
-        } else {
-    %>
-    <form action="loginPage.jsp" method="post">
+        %>
         <tr>
             <td colspan="2">
-                login
+                로그인
             </td>
         </tr>
         <tr>
             <td>
-                id
+                아이디
             </td>
             <td>
                 <input type="text" name="id">
@@ -58,7 +77,7 @@
         </tr>
         <tr>
             <td>
-                password
+                비밀번호
             </td>
             <td>
                 <input type="password" name="password">
@@ -66,14 +85,74 @@
         </tr>
         <tr>
             <td colspan="2">
-                <input type="button" value="join" onclick="location.href='joinPage.jsp'">
-                <input type="submit" value="login">
+                <input type="button" value="회원가입" onclick="location.href='joinPage.jsp'">
+                <input type="button" value="로그인" onclick="login()">
             </td>
         </tr>
-    </form>
+    </table>
+</form>
+<%
+} else {
+%>
+<table>
+    <tr>
+        <td colspan="3">
+            <%=session.getAttribute("id")%>님 안녕하세요
+            <input type="button" value="로그아웃" onclick="logout()">
+        </td>
+    </tr>
+    <tr>
+        <td>
+            제목
+        </td>
+        <td>
+            작성자
+        </td>
+        <td>
+            작성일
+        </td>
+    </tr>
+    <%
+        ArrayList<Content> contents = dataAccessObject.selectContent();
+        for (int i = 0; i < contents.size(); i++) {
+    %>
+    <tr>
+        <td>
+            <%=contents.get(i).getTitle()%>
+        </td>
+        <td>
+            <%=dataAccessObject.findMember(contents.get(i).getIdx()).getName()%>
+        </td>
+        <td>
+            <%=contents.get(i).getDate()%>
+        </td>
+    </tr>
     <%
         }
     %>
+    <tr>
+        <td colspan="3">
+            <input type="button" value="글쓰기" onclick="location.href='createContent.jsp'">
+        </td>
+    </tr>
 </table>
+<%
+    }
+%>
+<script>
+    function login() {
+        if (loginPage.id.value == "") {
+            alert("아이디를 입력해주세요");
+        } else if (loginPage.password.value == "") {
+            alert("비밀번호를 입력해주세요.")
+        } else {
+            loginPage.submit();
+        }
+    }
+
+    function logout() {
+        location.href = 'loginPage.jsp?logout=true'
+    }
+</script>
 </body>
 </html>
