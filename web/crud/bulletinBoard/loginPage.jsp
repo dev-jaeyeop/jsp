@@ -6,10 +6,11 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="bulletinBoard.DataAccessObject" %>
-<%@ page import="bulletinBoard.Member" %>
+<%@ page import="bulletinBoard.dto.User" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="bulletinBoard.Content" %>
+<%@ page import="bulletinBoard.dto.Content" %>
+<%@ page import="bulletinBoard.dao.UserDAO" %>
+<%@ page import="bulletinBoard.dao.ContentDAO" %>
 <html>
 <head>
     <title>loginPage</title>
@@ -28,10 +29,9 @@
     </style>
 </head>
 <body>
-<form name="loginPage" action="loginPage.jsp" method="post">
-    <table class="login">
+<form action="loginPage.jsp" method="post" name="login">
+    <table>
         <%
-            DataAccessObject dataAccessObject = new DataAccessObject();
             String id = request.getParameter("id");
             String password = request.getParameter("password");
             String logout = request.getParameter("logout");
@@ -45,16 +45,18 @@
         <%
             }
 
+            UserDAO userDAO = new UserDAO();
+
             if (session.getAttribute("id") == null) { // login check
-                Member member = dataAccessObject.findMember(id); // member check
-                if (member != null && member.getId().equals(id) && member.getPassword().equals(password)) {
+                User findUser = userDAO.find(id); // user check
+                if (findUser != null && findUser.getId().equals(id) && findUser.getPassword().equals(password)) {
                     session.setAttribute("id", id);
         %>
         <script>
             location.href = 'loginPage.jsp';
         </script>
         <%
-        } else if (id != null && password != null && member == null) {
+        } else if (id != null && password != null && findUser == null) {
         %>
         <script>
             alert("아이디와 비밀번호를 확인해주세요.")
@@ -86,7 +88,7 @@
         <tr>
             <td colspan="2">
                 <input type="button" value="회원가입" onclick="location.href='joinPage.jsp'">
-                <input type="button" value="로그인" onclick="login()">
+                <input type="button" value="로그인" onclick="loginFun()">
             </td>
         </tr>
     </table>
@@ -96,12 +98,15 @@
 %>
 <table>
     <tr>
-        <td colspan="3">
+        <td colspan="4">
             <%=session.getAttribute("id")%>님 안녕하세요
-            <input type="button" value="로그아웃" onclick="logout()">
+            <input type="button" value="로그아웃" onclick="logoutFun()">
         </td>
     </tr>
     <tr>
+        <td>
+            번호
+        </td>
         <td>
             제목
         </td>
@@ -113,15 +118,21 @@
         </td>
     </tr>
     <%
-        ArrayList<Content> contents = dataAccessObject.selectContent();
+        ContentDAO contentDAO = new ContentDAO();
+
+        ArrayList<Content> contents = contentDAO.findAll();
         for (int i = 0; i < contents.size(); i++) {
     %>
-    <tr>
+    <tr style="cursor: pointer"
+        onclick="location.href='viewContents.jsp?idx=<%=contents.get(i).getIdx()%>'">
+        <td>
+            <%=i + 1%>
+        </td>
         <td>
             <%=contents.get(i).getTitle()%>
         </td>
         <td>
-            <%=dataAccessObject.findMember(contents.get(i).getIdx()).getName()%>
+            <%=contents.get(i).getId()%>
         </td>
         <td>
             <%=contents.get(i).getDate()%>
@@ -131,7 +142,7 @@
         }
     %>
     <tr>
-        <td colspan="3">
+        <td colspan="4">
             <input type="button" value="글쓰기" onclick="location.href='createContent.jsp'">
         </td>
     </tr>
@@ -140,17 +151,17 @@
     }
 %>
 <script>
-    function login() {
-        if (loginPage.id.value == "") {
+    function loginFun() {
+        if (login.id.value == "") {
             alert("아이디를 입력해주세요");
-        } else if (loginPage.password.value == "") {
+        } else if (login.password.value == "") {
             alert("비밀번호를 입력해주세요.")
         } else {
-            loginPage.submit();
+            login.submit();
         }
     }
 
-    function logout() {
+    function logoutFun() {
         location.href = 'loginPage.jsp?logout=true'
     }
 </script>
