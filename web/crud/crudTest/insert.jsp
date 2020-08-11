@@ -13,16 +13,16 @@
 </head>
 <body>
 <%
-    String memberId = request.getParameter("id");
-    String memberPassword = request.getParameter("password");
+    String id = request.getParameter("id");
+    String password = request.getParameter("password");
     String name = request.getParameter("name");
     String email = request.getParameter("email");
 
     DataAccessObject dataAccessObject = new DataAccessObject();
-    dataAccessObject.insert(memberId, memberPassword, name, email);
+    dataAccessObject.insert(id, password, name, email);
 %>
 <script>
-    alert("access")
+    alert("success")
     location.href = 'view.jsp';
 </script>
 </body>

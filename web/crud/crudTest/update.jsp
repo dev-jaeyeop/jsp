@@ -6,8 +6,7 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="crudTest.DataAccessObject" %>
-<%@ page import="crudTest.DataTransferObject" %>
+<%@ page import="java.sql.*" %>
 <html>
 <head>
     <title>update</title>
@@ -20,10 +19,26 @@
 </head>
 <body>
 <%
-    String id = request.getParameter("id");
+    String memberId = request.getParameter("id");
 
-    DataAccessObject user = new DataAccessObject();
-    DataTransferObject findUser = user.find(id);
+    Class.forName("com.mysql.jdbc.Driver");
+
+    Connection connection = null;
+    Statement statement = null;
+    ResultSet resultSet = null;
+
+    try {
+        String jdbcDriver = "jdbc:mysql://localhost:3306/testdb";
+        String dbId = "root";
+        String dbPassword = "autoset";
+
+        String query = "select * from member where memberid = '" + memberId + "'";
+
+        connection = DriverManager.getConnection(jdbcDriver, dbId, dbPassword);
+        statement = connection.createStatement();
+        resultSet = statement.executeQuery(query);
+
+        if (resultSet.next()) {
 %>
 <form action="updateProcess.jsp">
     <table>
@@ -37,7 +52,7 @@
                 ID
             </td>
             <td>
-                <input type="text" name="id" value="<%=findUser.getId()%>">
+                <input type="text" name="id" value="<%=resultSet.getString("memberid")%>">
             </td>
         </tr>
         <tr>
@@ -45,7 +60,7 @@
                 PASSWORD
             </td>
             <td>
-                <input type="text" name="password" value="<%=findUser.getPassword()%>">
+                <input type="text" name="password" value="<%=resultSet.getString("password")%>">
             </td>
         </tr>
         <tr>
@@ -53,7 +68,7 @@
                 NAME
             </td>
             <td>
-                <input type="text" name="name" value="<%=findUser.getName()%>">
+                <input type="text" name="name" value="<%=resultSet.getString("name")%>">
             </td>
         </tr>
         <tr>
@@ -61,7 +76,7 @@
                 E-MAIL
             </td>
             <td>
-                <input type="email" name="email" value="<%=findUser.getEmail()%>">
+                <input type="email" name="email" value="<%=resultSet.getString("email")%>">
             </td>
         </tr>
         <tr>
@@ -69,9 +84,26 @@
                 <input type="submit" value="update">
             </td>
         </tr>
-        <input type="hidden" name="oid" value="<%=id%>">
+        <input type="hidden" name="oid" value="<%=memberId%>">
     </table>
 </form>
+<%
+        }
+    } catch (SQLException e) {
+        e.getMessage();
+        e.printStackTrace();
+    } finally {
+        if (resultSet != null) {
+            statement.close();
+        }
+        if (statement != null) {
+            statement.close();
+        }
+        if (connection != null) {
+            connection.close();
+        }
+    }
+%>
 </body>
 </html>
 

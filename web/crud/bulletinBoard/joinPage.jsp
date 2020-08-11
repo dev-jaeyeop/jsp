@@ -35,7 +35,6 @@
 </head>
 <body>
 <%
-    UserDAO userDAO = new UserDAO();
     String id = request.getParameter("id");
     String password = request.getParameter("password");
     String name = request.getParameter("name");
@@ -43,6 +42,7 @@
     String phoneNumber = request.getParameter("phoneNumber");
 
     if (id != null && password != null && name != null && email != null && phoneNumber != null) {
+        UserDAO userDAO = new UserDAO();
         userDAO.create(id, password, name, email, phoneNumber);
 %>
 <script>
@@ -51,7 +51,7 @@
 <%
     }
 %>
-<form name="joinPage" action="joinPage.jsp" method="post">
+<form action="joinPage.jsp" method="post" name="join">
     <table>
         <tr>
             <td colspan="3">
@@ -103,28 +103,28 @@
         </tr>
         <tr>
             <td colspan="3">
-                <input type="button" value="이전 페이지" onclick="location.href='loginPage.jsp'">
-                <input type="button" value="회원가입" onclick="join()">
+                <input type="button" value="이전 페이지" onclick="history.back()">
+                <input type="button" value="회원가입" onclick="joinFun()">
             </td>
         </tr>
     </table>
 </form>
 <script>
-    function join() {
-        if (joinPage.id.value == "") {
+    function joinFun() {
+        if (join.id.value == "") {
             alert("아이디를 입력해주세요");
-        } else if (joinPage.password.value == "") {
+        } else if (join.password.value == "") {
             alert("비밀번호를 입력해주세요.")
-        } else if (joinPage.name.value == "") {
+        } else if (join.name.value == "") {
             alert("이름을 입력해주세요.")
-        } else if (joinPage.email.value == "") {
+        } else if (join.email.value == "") {
             alert("이메일을 입력해주세요.")
-        } else if (joinPage.phoneNumber.value == "") {
+        } else if (join.phoneNumber.value == "") {
             alert("전화번호를 입력해주세요.")
         } else if ($("#checkID").text() == "사용 불가") {
             alert("사용할 수 없는 아이디 입니다.")
         } else if ($("#checkID").text() == "사용 가능") {
-            joinPage.submit();
+            join.submit();
         }
     }
 

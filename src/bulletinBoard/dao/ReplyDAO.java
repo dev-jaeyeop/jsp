@@ -16,7 +16,7 @@ public class ReplyDAO {
 
     public int create(String idx, String id, String reply) {
         int result = 0;
-        String query = "insert into replies values(?, ?, ?)";
+        String query = "insert into replies values(?, ?, ?, default)";
 
         try {
             connection = pool.getConnection();
@@ -46,7 +46,8 @@ public class ReplyDAO {
             while (resultSet.next()) {
                 Reply reply = new Reply(resultSet.getInt("idx"),
                         resultSet.getString("id"),
-                        resultSet.getString("reply")
+                        resultSet.getString("reply"),
+                        resultSet.getString("date")
                 );
                 replies.add(reply);
             }
@@ -71,7 +72,8 @@ public class ReplyDAO {
             while (resultSet.next()) {
                 Reply reply = new Reply(resultSet.getInt("idx"),
                         resultSet.getString("id"),
-                        resultSet.getString("reply")
+                        resultSet.getString("reply"),
+                        resultSet.getString("date")
                 );
                 replies.add(reply);
             }
@@ -84,15 +86,14 @@ public class ReplyDAO {
         return replies;
     }
 
-    public int delete(int idx, String id) {
+    public int delete(String idx) {
         int result = 0;
-        String query = "delete from replies where idx = ? and id = ?";
+        String query = "delete from replies where idx = ?";
 
         try {
             connection = pool.getConnection();
             preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, idx);
-            preparedStatement.setString(1, id);
+            preparedStatement.setInt(1, Integer.parseInt(idx));
             result = preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

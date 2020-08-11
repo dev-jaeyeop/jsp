@@ -5,147 +5,67 @@ import java.util.ArrayList;
 
 public class DataAccessObject {
 
-    private Connection getConnection() {
+    public Connection getConnection() throws SQLException, ClassNotFoundException {
         Connection connection = null;
         String jdbcDriver = "jdbc:mysql://localhost:3306/testdb";
         String dbId = "root";
         String dbPassword = "autoset";
 
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            connection = DriverManager.getConnection(jdbcDriver, dbId, dbPassword);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        Class.forName("com.mysql.jdbc.Driver");
+        connection = DriverManager.getConnection(jdbcDriver, dbId, dbPassword);
 
         return connection;
     }
 
-    public int insert(String id, String password, String name, String email) {
+    public void insert(String id, String password, String name, String email) throws SQLException, ClassNotFoundException {
         Connection connection = getConnection();
-        PreparedStatement preparedStatement = null;
+
+        Statement statement = null;
         int resultSet = 0;
 
-        String query = "insert into member values(?, ?, ?, ?)";
+        String query = "insert into member values('" + id + "', '" + password + "', '" + name + "', '" + email + "')";
+        statement = connection.createStatement();
+        resultSet = statement.executeUpdate(query);
 
-        try {
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, id);
-            preparedStatement.setString(2, password);
-            preparedStatement.setString(3, name);
-            preparedStatement.setString(4, email);
-            resultSet = preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        freeCon(preparedStatement, connection);
-
-        return resultSet;
+        freeCon(statement, connection);
     }
 
-    public ArrayList<DataTransferObject> select() {
-        ArrayList<DataTransferObject> users = new ArrayList<>();
+    public ArrayList<DataTransferObject> select() throws SQLException, ClassNotFoundException {
+        ArrayList<DataTransferObject> memberInfo = new ArrayList<>();
         Connection connection = getConnection();
         Statement statement = null;
         ResultSet resultSet = null;
 
         String query = "select * from member";
+        statement = connection.createStatement();
+        resultSet = statement.executeQuery(query);
 
-        try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(query);
-
-            while (resultSet.next()) {
-                DataTransferObject user = new DataTransferObject();
-                user.setId(resultSet.getString("memberid"));
-                user.setPassword(resultSet.getString("password"));
-                user.setName(resultSet.getString("name"));
-                user.setEmail(resultSet.getString("email"));
-                users.add(user);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+        while (resultSet.next()) {
+            DataTransferObject dataTransferObject = new DataTransferObject();
+            dataTransferObject.setId(resultSet.getString("memberid"));
+            dataTransferObject.setPassword(resultSet.getString("password"));
+            dataTransferObject.setName(resultSet.getString("name"));
+            dataTransferObject.setEmail(resultSet.getString("email"));
+            memberInfo.add(dataTransferObject);
         }
-
 
         freeCon(resultSet, statement, connection);
 
-        return users;
+        return memberInfo;
     }
 
-    public DataTransferObject find(String id) {
+    public void update(String id, String password, String name, String email, String oid) throws SQLException, ClassNotFoundException {
         Connection connection = getConnection();
         Statement statement = null;
-        ResultSet resultSet = null;
-        DataTransferObject findUser = new DataTransferObject();
-
-        String query = "select * from member where memberid = '" + id + "'";
-
-        try {
-            statement = connection.createStatement();
-            resultSet = statement.executeQuery(query);
-
-            if (resultSet.next()) {
-                findUser.setId(resultSet.getString("memberid"));
-                findUser.setPassword(resultSet.getString("password"));
-                findUser.setName(resultSet.getString("name"));
-                findUser.setEmail(resultSet.getString("email"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        freeCon(resultSet, statement, connection);
-
-        return findUser;
-    }
-
-    public int update(String id, String password, String name, String email, String oid) {
-        Connection connection = getConnection();
-        PreparedStatement preparedStatement = null;
         int resultSet = 0;
 
-        String query = "update member set memberid = ?, password = ?, name = ?, email = ? where memberid = ?";
+        String query = "update member set memberid = '" + id + "', password = '" + password + "', name = '" + name + "', email = '" + email + "' where memberid = '" + oid + "'";
+        statement = connection.createStatement();
+        resultSet = statement.executeUpdate(query);
 
-        try {
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, id);
-            preparedStatement.setString(2, password);
-            preparedStatement.setString(3, email);
-            preparedStatement.setString(4, name);
-            preparedStatement.setString(5, oid);
-            resultSet = preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        freeCon(preparedStatement, connection);
-
-        return resultSet;
+        freeCon(statement, connection);
     }
 
-    public int delete(String id) {
-        Connection connection = getConnection();
-        PreparedStatement preparedStatement = null;
-        int resultSet = 0;
-
-        String query = "delete from member where memberid = ?";
-
-        try {
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, id);
-            resultSet = preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        freeCon(preparedStatement, connection);
-
-        return resultSet;
-    }
 
     private void freeCon(ResultSet resultSet, Statement statement, Connection connection) {
         try {
@@ -163,10 +83,10 @@ public class DataAccessObject {
         }
     }
 
-    private void freeCon(PreparedStatement preparedStatement, Connection connection) {
+    private void freeCon( Statement statement, Connection connection) {
         try {
-            if (preparedStatement != null) {
-                preparedStatement.close();
+            if (statement != null) {
+                statement.close();
             }
             if (connection != null) {
                 connection.close();

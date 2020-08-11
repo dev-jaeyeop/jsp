@@ -26,43 +26,50 @@
 </style>
 <body>
 <%
-    if (session.getAttribute("id") == null) {
+    String sessionId = (String) session.getAttribute("id");
+    if (sessionId == null) {
 %>
 <script>
-    alert("로그인이 필요합니다.");
+    alert("로그인을 해주세요.");
     location.href = 'loginPage.jsp';
 </script>
 <%
 } else {
     String title = request.getParameter("title");
     String content = request.getParameter("content");
-    String id = (String) session.getAttribute("id");
 
     if (title != null && content != null) {
         ContentDAO contentDAO = new ContentDAO();
 
-        if (contentDAO.create(id, title, content) > 0) {
+        if (contentDAO.create(sessionId, title, content) > 0) {
 %>
 <script>
     location.href = 'loginPage.jsp';
 </script>
 <%
+} else {
+%>
+<script>
+    alert("create error");
+    location.href='loginPage.jsp';
+</script>
+<%
         }
     }
 %>
-<form action="createContent.jsp" method="post" name="content" >
+<form action="createContent.jsp" method="post" name="create">
     <table>
         <tr>
             <td>
-                title
+                제목
             </td>
             <td>
-                <input type="text" name="title">
+                <input type="text" name="title" style="width: 100%; border: none">
             </td>
         </tr>
         <tr>
             <td>
-                content
+                내용
             </td>
             <td>
                 <textarea name="content" cols="30" rows="10" style="border: none"></textarea>
@@ -70,7 +77,7 @@
         </tr>
         <tr>
             <td colspan="2">
-                <input type="button" value="작성완료" onclick="contentFun()">
+                <input type="button" value="등록" onclick="createFun()">
             </td>
         </tr>
     </table>
@@ -79,13 +86,13 @@
     }
 %>
 <script>
-    function contentFun() {
-        if (content.title.value == "") {
+    function createFun() {
+        if (create.title.value == "") {
             alert("제목을 입력해주세요");
-        } else if (contentPage.content.value == "") {
+        } else if (create.content.value == "") {
             alert("내용을 입력해주세요.")
         } else {
-            content.submit();
+            create.submit();
         }
     }
 </script>
