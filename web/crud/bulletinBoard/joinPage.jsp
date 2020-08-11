@@ -6,21 +6,36 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="bulletinBoard.DataAccessObject" %>
+<%@ page import="bulletinBoard.dao.UserDAO" %>
 <html>
 <head>
     <title>joinPage</title>
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         table, td {
             border-collapse: collapse;
             border: 1px solid black;
             text-align: center;
         }
+
+        td:nth-child(2) {
+            text-align: left;
+        }
+
+        #checkID {
+            font-size: 12px;
+        }
     </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
 <body>
 <%
-    DataAccessObject dataAccessObject = new DataAccessObject();
+    UserDAO userDAO = new UserDAO();
     String id = request.getParameter("id");
     String password = request.getParameter("password");
     String name = request.getParameter("name");
@@ -28,26 +43,18 @@
     String phoneNumber = request.getParameter("phoneNumber");
 
     if (id != null && password != null && name != null && email != null && phoneNumber != null) {
-        if (dataAccessObject.checkID(id) == null) {
-            dataAccessObject.create(id, password, name, email, phoneNumber);
+        userDAO.create(id, password, name, email, phoneNumber);
 %>
 <script>
     location.href = 'loginPage.jsp';
 </script>
 <%
-} else {
-%>
-<script>
-    alert("이미 사용중인 아이디입니다.")
-</script>
-<%
-        }
     }
 %>
-<form name="join" action="joinPage.jsp" method="post">
+<form name="joinPage" action="joinPage.jsp" method="post">
     <table>
         <tr>
-            <td colspan="2">
+            <td colspan="3">
                 회원가입
             </td>
         </tr>
@@ -55,8 +62,11 @@
             <td>
                 아이디
             </td>
-            <td>
-                <input type="text" name="id">
+            <td style="border-right: 0">
+                <input type="text" name="id" id="id">
+            </td>
+            <td name="checkID" id="checkID" style="width: 60px; border-left: 0">
+
             </td>
         </tr>
         <tr>
@@ -92,29 +102,53 @@
             </td>
         </tr>
         <tr>
-            <td colspan="2">
+            <td colspan="3">
                 <input type="button" value="이전 페이지" onclick="location.href='loginPage.jsp'">
-                <input type="button" value="회원가입" onclick="check()">
+                <input type="button" value="회원가입" onclick="join()">
             </td>
         </tr>
     </table>
 </form>
 <script>
-    function check() {
-        if (join.id.value == "") {
+    function join() {
+        if (joinPage.id.value == "") {
             alert("아이디를 입력해주세요");
-        } else if (join.password.value == "") {
+        } else if (joinPage.password.value == "") {
             alert("비밀번호를 입력해주세요.")
-        } else if (join.name.value == "") {
+        } else if (joinPage.name.value == "") {
             alert("이름을 입력해주세요.")
-        } else if (join.email.value == "") {
+        } else if (joinPage.email.value == "") {
             alert("이메일을 입력해주세요.")
-        } else if (join.phoneNumber.value == "") {
+        } else if (joinPage.phoneNumber.value == "") {
             alert("전화번호를 입력해주세요.")
-        } else {
-            join.submit();
+        } else if ($("#checkID").text() == "사용 불가") {
+            alert("사용할 수 없는 아이디 입니다.")
+        } else if ($("#checkID").text() == "사용 가능") {
+            joinPage.submit();
         }
     }
+
+    $("#id").keyup(function () {
+        var params = "id=" + $("#id").val();
+        $.ajax({
+            type: "POST",
+            url: "checkID.jsp",
+            data: params,
+            dataType: "json",
+            success: function (args) {
+                if ($("#id").val() != "") {
+                    $("#checkID").html(args.result);
+                    if (args.result == '사용 가능') {
+                        $("#checkID").css("color", "green");
+                    } else {
+                        $("#checkID").css("color", "red");
+                    }
+                } else {
+                    $("#checkID").html("");
+                }
+            },
+        });
+    });
 </script>
 </body>
 </html>

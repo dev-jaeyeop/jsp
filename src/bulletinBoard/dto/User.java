@@ -1,6 +1,6 @@
-package bulletinBoard;
+package bulletinBoard.dto;
 
-public class Member {
+public class User {
     private int idx;
     private int level;
     private String id;
@@ -8,6 +8,16 @@ public class Member {
     private String name;
     private String email;
     private String phoneNumber;
+
+    public User(int idx, int level, String id, String password, String name, String email, String phoneNumber) {
+        this.idx = idx;
+        this.level = level;
+        this.id = id;
+        this.password = password;
+        this.name = name;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+    }
 
     public int getIdx() {
         return idx;

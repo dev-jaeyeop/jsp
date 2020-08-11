@@ -21,7 +21,7 @@
  * LOST PROFITS OR OTHER INCIDENTAL OR CONSEQUENTIAL DAMAGES RELATING
  * TO THE SOFTWARE.
  */
-package bulletinBoard;
+package ajaxTest;
 
 import java.sql.*;
 import java.util.Properties;
@@ -36,7 +36,7 @@ public class DBConnectionMgr {
     private static DBConnectionMgr instance = null;
     private Vector connections = new Vector(10);
     private String _driver = "com.mysql.jdbc.Driver",
-            _url = "jdbc:mysql://127.0.0.1:3306/bullentin_board",
+            _url = "jdbc:mysql://127.0.0.1:3306/testdb",
             _user = "root",
             _password = "autoset";
     private boolean _traceOn = false;
