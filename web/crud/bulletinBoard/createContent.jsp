@@ -64,7 +64,8 @@
                 제목
             </td>
             <td>
-                <input type="text" name="title" style="width: 100%; border: none">
+                <input type="text" name="title" placeholder="제목을 입력해주세요."
+                       style="width: 400px; padding: 10px; outline: none; border-style: none;">
             </td>
         </tr>
         <tr>
@@ -72,12 +73,14 @@
                 내용
             </td>
             <td>
-                <textarea name="content" cols="30" rows="10" style="border: none"></textarea>
+                <textarea name="content" id="content" cols="30" rows="10" placeholder="내용을 입력해주세요."
+                          style="width: 100%; height:300px; padding: 10px; resize: none; outline: none; border-style: none;"></textarea>
             </td>
         </tr>
         <tr>
             <td colspan="2">
-                <input type="button" value="등록" onclick="createFun()">
+                <input type="button" value="등록하기" onclick="createFun()">
+                <input type="button" value="뒤로가기" onclick="history.back()">
             </td>
         </tr>
     </table>

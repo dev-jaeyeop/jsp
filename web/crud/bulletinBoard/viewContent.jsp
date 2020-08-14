@@ -38,6 +38,7 @@
 
     String deleteContent = request.getParameter("deleteContent");
     String deleteReply = request.getParameter("deleteReply");
+    String updateReply = request.getParameter("updateReply");
 
     UserDAO userDAO = new UserDAO();
     ContentDAO contentDAO = new ContentDAO();
@@ -49,7 +50,7 @@
 %>
 <script>
     alert("삭제가 완료되었습니다.");
-    location.href='loginPage.jsp';
+    location.href = 'loginPage.jsp';
 </script>
 <%
     }
@@ -62,6 +63,14 @@
 </script>
 <%
         }
+    }
+
+    if (updateReply != null) {
+%>
+<script>
+    alert("댓글 수정 미구현")
+</script>
+<%
     }
 
     if (deleteContent == null && idx != null) {
@@ -112,7 +121,7 @@
                 if (sessionId != null && sessionId.equals(findUser.getId())) {
             %>
             <input type="button" value="수정하기" onclick="location.href='updateContent.jsp?idx=<%=idx%>'">
-            <input type="button" value="삭제하기" onclick="location.href='viewContent.jsp?idx=<%=idx%>&deleteContent=true'">
+            <input type="button" value="삭제하기" onclick="deleteFun()">
             <%
                 }
             %>
@@ -142,11 +151,17 @@
         </td>
         <td>
             <div style="display: flex; justify-content: space-between; padding: 5px">
-                <%=findReplies.get(i).getReply()%>
+                <input type="text" value="<%=findReplies.get(i).getReply()%>" readonly="true" id="<%=i%>"
+                       style="outline: none; border-style: none;">
                 <%
                     if (sessionId != null && sessionId.equals(findReplies.get(i).getId())) {
                 %>
-                <input type="button" value="수정">
+                <div>
+                    <input type="button" value="수정" onclick="updateFun(<%=i%>)" id="updateFun<%=i%>">
+                    <input type="button" value="완료" onclick="updateSuccessFun(<%=i%>)" id="updateSuccessFun<%=i%>"
+                           style="display: none">
+                    <input type="button" value="삭제">
+                </div>
                 <%
                     }
                 %>
@@ -186,6 +201,27 @@
     }
 %>
 <script>
+    let oText;
+    let nText;
+
+    function updateFun(id) {
+        oText = document.getElementById(id).value;
+        document.getElementById("updateFun" + id).style.display = 'none';
+        document.getElementById("updateSuccessFun" + id).style.display = 'inline-block';
+        document.getElementById(id).readOnly = false;
+        document.getElementById(id).focus();
+    }
+
+    function updateSuccessFun(id) {
+        nText = document.getElementById(id).value;
+        if (oText != nText) {
+            location.href = 'viewContent.jsp?idx<%=idx%>&updateReply=' + nText;
+        } else {
+            alert("수정하지 않았습니다.")
+            location.href = 'viewContent.jsp?idx<%=idx%>'
+        }
+    }
+
     function replyFun() {
         if (document.getElementById("sessionId").value == "null") {
             alert("로그인을 해주세요.")
@@ -194,6 +230,15 @@
             alert("댓글을 입력해주세요.")
         } else {
             reply.submit();
+        }
+    }
+
+    function deleteFun() {
+        if (window.confirm("삭제하시겠습니까?")) {
+            location.href = 'viewContent.jsp?idx=<%=idx%>&deleteContent=true'
+        } else {
+            alert("취소되었습니다.")
+            location.href = 'viewContent.jsp?idx=<%=idx%>'
         }
     }
 </script>

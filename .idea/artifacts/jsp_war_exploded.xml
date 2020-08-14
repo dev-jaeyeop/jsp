@@ -13,6 +13,7 @@
           <element id="library" level="project" name="json-simple-1.1.1" />
           <element id="library" level="project" name="commons-fileupload-1.4" />
           <element id="library" level="project" name="cos" />
+          <element id="library" level="project" name="jsp-api" />
         </element>
       </element>
       <element id="javaee-facet-resources" facet="jsp/web/Web" />

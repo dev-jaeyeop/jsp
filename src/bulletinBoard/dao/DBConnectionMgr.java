@@ -38,7 +38,7 @@ public class DBConnectionMgr {
     private String _driver = "com.mysql.jdbc.Driver",
             _url = "jdbc:mysql://127.0.0.1:3306/bullentin_board",
             _user = "root",
-            _password = "0000";
+            _password = "autoset";
     private boolean _traceOn = false;
     private boolean initialized = false;
     private int _openConnections = 10;

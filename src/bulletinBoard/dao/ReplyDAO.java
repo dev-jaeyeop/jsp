@@ -60,31 +60,6 @@ public class ReplyDAO {
         return replies;
     }
 
-    public ArrayList<Reply> findById(String id) {
-        ArrayList<Reply> replies = new ArrayList<>();
-        String query = "select * from replies where id = ?";
-
-        try {
-            connection = pool.getConnection();
-            preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, id);
-            resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                Reply reply = new Reply(resultSet.getInt("idx"),
-                        resultSet.getString("id"),
-                        resultSet.getString("reply"),
-                        resultSet.getString("date")
-                );
-                replies.add(reply);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            pool.freeConnection(connection, preparedStatement, resultSet);
-        }
-
-        return replies;
-    }
 
     public int delete(String idx) {
         int result = 0;
@@ -105,4 +80,5 @@ public class ReplyDAO {
 
         return result;
     }
+
 }

@@ -36,7 +36,7 @@ public class ContentDAO {
 
     public ArrayList<Content> findAll() {
         ArrayList<Content> contents = new ArrayList<>();
-        String query = "select * from contents";
+        String query = "select * from contents order by date desc";
 
         try {
             connection = pool.getConnection();
